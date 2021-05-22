@@ -1,0 +1,52 @@
+[package]
+name    = "toshi-server"
+version = "0.1.1"
+authors = ["Stephen Carman <shcarman@gmail.com>"]
+description = "A full text search engine based on Tantivy"
+repository = "https://github.com/toshi-search/Toshi"
+license = "MIT"
+edition = "2018"
+
+[[bin]]
+name = "toshi"
+
+[lib]
+path = "src/lib.rs"
+
+[dependencies]
+toshi-proto            = { path = "../toshi-proto" }
+toshi-types            = { path = "../toshi-types" }
+toshi-raft             = { path = "../toshi-raft" }
+http                   = "^0.2"
+bytes                  = "^1"
+hyper                  = { version = "~0.14.4", features = ["stream"] }
+serde_json             = "^1.0"
+serde_urlencoded       = "^0.7"
+futures                = "^0.3"
+tower-util             = "^0.3"
+tonic                  = "^0.4"
+tantivy                = "^0.14"
+tokio                  = { version = "^1", features = ["full", "parking_lot"] }
+async-trait            = "^0.1"
+config                 = "^0.10"
+structopt              = "^0.3"
+thiserror              = "^1.0"
+anyhow                 = "^1.0"
+dashmap                = "^4"
+serde                  = { version = "^1.0", features = ["derive"] }
+clap                   = { version = "^2.3", features = ["color"] }
+slog                   = "^2.7"
+slog-async             = "^2.3"
+slog-term              = "^2.4"
+slog-stdlog            = "^4.0"
+slog-scope             = "^4.3"
+log                    = { version = "*", features = ["max_level_trace", "release_max_level_warn"] }
+sloggers               = "^1"
+toml                   = "^0.5"
+async-channel          = "^1"
+
+[dev-dependencies]
+remove_dir_all         = "^0.6"
+pretty_assertions      = "^0.6"
+tokio-test             = "^0.4"
+toshi                  = { path = "../toshi-client", default-features = false, features = ["hyper_client"] }

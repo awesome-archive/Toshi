@@ -1,0 +1,112 @@
+syntax = "proto3";
+
+package clusterrpc;
+
+import "eraftpb.proto";
+
+service IndexService {
+    rpc ping (PingRequest) returns (PingReply);
+    rpc place_index (PlaceRequest) returns (ResultReply);
+    rpc list_indexes (ListRequest) returns (ListReply);
+    rpc place_document (DocumentRequest) returns (ResultReply);
+    rpc delete_document (DeleteRequest) returns (DeleteReply);
+    rpc search_index (SearchRequest) returns (SearchReply);
+    rpc get_summary (SummaryRequest) returns (SummaryReply);
+    rpc raft_request (RaftRequest) returns (RaftReply);
+    rpc join (JoinRequest) returns (ResultReply);
+}
+
+enum ResultCode {
+    SUCCESS = 0;
+    FAILURE = 1;
+    NO_RESULTS = 2;
+    UNKNOWNNNNN = 3;
+    MAGIC_UNICORN = 4;
+}
+
+enum RaftRequestType {
+    JOIN = 0;
+    LEAVE = 1;
+    ADD = 2;
+    DELETE = 3;
+    COMMIT = 4;
+    CONF_CHANGE = 5;
+    PING = 6;
+}
+
+message JoinRequest {
+    uint64 id = 1;
+    string host = 2;
+}
+
+message RaftRequest {
+    RaftRequestType tpe = 1;
+    bytes message = 2;
+}
+
+message RaftReply {
+    ResultCode code = 1;
+}
+
+message ResultReply {
+    ResultCode code = 1;
+    string message = 2;
+}
+
+message ListRequest {
+}
+
+message ListReply {
+    repeated string indexes = 1;
+}
+
+message PingReply {
+    string status = 1;
+}
+
+message PingRequest {
+}
+
+message SearchRequest {
+    string index = 1;
+    bytes query = 2;
+}
+
+message SearchReply {
+    ResultReply result = 1;
+    bytes doc = 2;
+}
+
+message PlaceRequest {
+    string index = 1;
+    bytes schema = 2;
+}
+
+message DocumentRequest {
+    string index = 1;
+    bytes document = 2;
+}
+
+message DeleteRequest {
+    string index = 1;
+    bytes terms = 2;
+}
+
+message ReplicaRequest {
+    string index = 1;
+    string from = 2;
+    string to = 3;
+}
+
+message SummaryRequest {
+    string index = 1;
+}
+
+message SummaryReply {
+    bytes summary = 1;
+}
+
+message DeleteReply {
+    string index = 1;
+    uint64 docs_affected = 2;
+}

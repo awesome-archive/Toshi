@@ -1,59 +1,14 @@
-[package]
-name    = "toshi"
-version = "0.1.1"
-authors = ["Stephen Carman <shcarman@gmail.com>"]
-description = "A full text search engine based on Tantivy"
-repository = "https://github.com/toshi-search/Toshi"
-license = "MIT"
-edition = "2018"
-build = "build.rs"
+[workspace]
+members = [
+    "toshi-server",
+    "toshi-proto",
+    "toshi-client",
+    "toshi-types",
+    "toshi-raft"
+]
 
-[[bin]]
-name = "toshi"
-
-[[bin]]
-name = "toshi-placement"
-
-[lib]
-path = "src/lib.rs"
-
-[build-dependencies]
-tower-grpc-build = { git = "https://github.com/tower-rs/tower-grpc" }
-
-[dependencies]
-tower-buffer      = "^0.1"
-tower-consul      = "^0.1"
-tower-grpc        = "^0.1"
-tower-h2          = "^0.1"
-tower-http        = "^0.1"
-tower-service     = "^0.2"
-tower-util        = "^0.1"
-tower-web         = "^0.3"
-http              = "^0.1"
-tokio-connect     = "^0.1"
-flate2            = "^1.0"
-bytes             = "^0.4"
-prost             = "^0.4"
-prost-derive      = "^0.4"
-hyper             = "^0.12"
-hyper-tls         = "^0.3"
-mime              = "^0.3"
-serde_json        = "^1.0"
-futures           = "^0.1"
-tantivy           = "^0.8"
-tokio             = "^0.1"
-tokio-signal      = "^0.2"
-tokio-tls         = "^0.2"
-config            = "^0.9"
-log               = "^0.4"
-pretty_env_logger = "^0.3"
-failure           = "^0.1"
-crossbeam         = "^0.6"
-num_cpus          = "^1.0"
-serde             = { version = "^1.0", features = ["derive"] }
-clap              = { version = "^2.32", features = ["color"] }
-uuid              = { version = "^0.7", features = ["v4"] }
-systemstat        = { git = "https://github.com/toshi-search/systemstat" }
+[profile.dev.package."*"]
+opt-level = 2
 
 [profile.release]
 opt-level = 3
@@ -62,14 +17,3 @@ debug-assertions = false
 lto = true
 rpath = false
 codegen-units = 1
-
-[patch.crates-io]
-tower-service        = { git = "https://github.com/tower-rs/tower" }
-tower-direct-service = { git = "https://github.com/tower-rs/tower" }
-tower-buffer         = { git = "https://github.com/tower-rs/tower" }
-tower-grpc           = { git = "https://github.com/tower-rs/tower-grpc" }
-tower-h2             = { git = "https://github.com/tower-rs/tower-h2" }
-tower-util           = { git = "https://github.com/tower-rs/tower" }
-tower-http           = { git = "https://github.com/tower-rs/tower-http" }
-tower-consul         = { git = "https://github.com/LucioFranco/tower-consul" }
-tokio-connect        = { git = "https://github.com/carllerche/tokio-connect" }

@@ -1,0 +1,33 @@
+[package]
+name    = "toshi-types"
+version = "0.1.1"
+authors = ["Stephen Carman <shcarman@gmail.com>"]
+description = "The types for a full text search engine based on Tantivy"
+repository = "https://github.com/toshi-search/Toshi"
+license = "MIT"
+edition = "2018"
+
+[dependencies]
+http        = "^0.2"
+thiserror   = "^1.0"
+anyhow      = "^1.0"
+serde       = "^1.0"
+serde_json  = "^1.0"
+tantivy     = "^0.14"
+async-trait = "^0.1"
+dashmap     = { version = "^4", features = ["serde"] }
+slog        = "^2.7"
+tokio       = { version = "^1", features = ["sync"] }
+toml        = "^0.5"
+
+[dependencies.tonic]
+version  = "^0.4"
+optional = true
+
+[dependencies.hyper]
+version  = "^0.14.4"
+optional = true
+
+[features]
+default      = ["extra-errors"]
+extra-errors = ["tonic", "hyper"]

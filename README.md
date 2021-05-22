@@ -1,13 +1,18 @@
 # Toshi
-##### A Full Text Search Engine in Rust Based on [Tantivy](https://github.com/tantivy-search/tantivy)
+##### A Full-Text Search Engine in Rust
 
-[![dependency status](https://deps.rs/repo/github/toshi-search/Toshi/status.svg)](https://deps.rs/repo/github/toshi-search/toshi) [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT) [![Build Status](https://travis-ci.org/toshi-search/Toshi.svg?branch=master)](https://travis-ci.org/toshi-search/Toshi) [![codecov](https://codecov.io/gh/toshi-search/Toshi/branch/master/graph/badge.svg)](https://codecov.io/gh/toshi-search/Toshi) [![Coverage Status](https://coveralls.io/repos/github/toshi-search/Toshi/badge.svg?branch=master)](https://coveralls.io/github/toshi-search/Toshi?branch=master) [![Join the chat at https://gitter.im/toshi-search/Toshi](https://badges.gitter.im/toshi-search/Toshi.svg)](https://gitter.im/toshi-search/Toshi?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT) 
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/4751c082efd74f849b5274d74c284c87)](https://app.codacy.com/app/shcarman/Toshi?utm_source=github.com&utm_medium=referral&utm_content=toshi-search/Toshi&utm_campaign=Badge_Grade_Settings)
+[![Actions Status](https://github.com/toshi-search/toshi/workflows/toshi-push/badge.svg)](https://github.com/toshi-search/toshi/actions)
+[![codecov](https://codecov.io/gh/toshi-search/Toshi/branch/master/graph/badge.svg)](https://codecov.io/gh/toshi-search/Toshi) 
+[![Join the chat at https://gitter.im/toshi-search/Toshi](https://badges.gitter.im/toshi-search/Toshi.svg)](https://gitter.im/toshi-search/Toshi?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+[![dependency status](https://deps.rs/repo/github/toshi-search/toshi/status.svg)](https://deps.rs/repo/github/toshi-search/toshi)
 
-*Note: This is far from production ready*
+> *Please note that this is far from production ready, also Toshi is still under active development, I'm just slow.*
 
 #### Description
-Toshi is meant to be a full text search engine similar to Elasticsearch. Toshi strives
-to be for Elasticsearch what [Tantivy](https://github.com/tantivy-search/tantivy) is to Lucene. 
+Toshi is meant to be a full-text search engine similar to Elasticsearch. Toshi strives
+to be to Elasticsearch what [Tantivy](https://github.com/tantivy-search/tantivy) is to Lucene. 
 
 #### Motivations
 Toshi will always target stable Rust and will try our best to never make any use of unsafe Rust. While underlying libraries may make some 
@@ -18,21 +23,29 @@ meant to be a library, I'm perfectly fine with having this requirement because p
 take it off the shelf and not modify it. My motivation was to cater to that use case when building Toshi.
 
 #### Build Requirements
-At this current time Toshi should build and work fine on Windows, Mac OS X, and Linux. From dependency requirements you are going to need Rust >= 1.27 and Cargo installed in order to build.
+At this current time Toshi should build and work fine on Windows, Mac OS X, and Linux. From dependency requirements you are going to need 1.39.0 and Cargo installed in order to build. You can get rust easily from
+[rustup](https://rustup.rs).
 
 #### Configuration
 
 There is a default configuration file in config/config.toml:
 
 ```toml
-host = "localhost"
+host = "127.0.0.1"
 port = 8080
-path = "data/"
+path = "data2/"
 writer_memory = 200000000
-log_level = "debug"
+log_level = "info"
 json_parsing_threads = 4
 bulk_buffer_size = 10000
 auto_commit_duration = 10
+experimental = false
+
+[experimental_features]
+master = true
+nodes = [
+    "127.0.0.1:8081"
+]
 
 [merge_policy]
 kind = "log"
@@ -44,7 +57,7 @@ level_log_size = 0.75
 ##### Host
 `host = "localhost"`
 
-The hostname Toshi will bind on upon start.
+The hostname Toshi will bind to upon start.
 
 ##### Port
 `port = 8080`
@@ -69,7 +82,7 @@ The detail level to use for Toshi's logging.
 ##### Json Parsing
 `json_parsing_threads = 4`
 
-When Toshi does a bulk ingest of documents it will spin up a number of threads to parse the document's JSON as it's
+When Toshi does a bulk ingest of documents it will spin up a number of threads to parse the document's json as it's
 received. This controls the number of threads spawned to handle this job.
 
 ##### Bulk Buffer
@@ -101,9 +114,23 @@ level_log_size = 0.75
 
 In addition there is the "nomerge" option, in which Tantivy will do no merging of segments.
 
+##### Experimental Settings
+```toml
+experimental = false
+
+[experimental_features]
+master = true
+nodes = [
+    "127.0.0.1:8081"
+]
+```
+
+In general these settings aren't ready for usage yet as they are very unstable or flat out broken. Right now the distribution of Toshi
+is behind this flag, so if experimental is set to false then all these settings are ignored.
+
+
 #### Building and Running
-Toshi can be build using `cargo build --release` once Toshi is built from the top level directory you can run `target/release/toshi` to
-start toshi according to the configuration in config/config.toml
+Toshi can be built using `cargo build --release`. Once Toshi is built you can run `./target/release/toshi` from the top level directory to start Toshi according to the configuration in config/config.toml
 
 You should get a startup message like this.
 
@@ -115,7 +142,6 @@ You should get a startup message like this.
  Such Relevance, Much Index, Many Search, Wow
  
  INFO  toshi::index > Indexes: []
- INFO  gotham::start >  Gotham listening on http://[::1]:8080 with 12 threads
 ```
 
 You can verify Toshi is running with:
@@ -126,71 +152,46 @@ curl -X GET http://localhost:8080/
 
 which should return:
 
-```html
-Toshi Search, Version: 0.1.0
+```json
+{
+  "name": "Toshi Search",
+  "version": "0.1.1"
+}
+```
+Once toshi is running it's best to check the `requests.http` file in the root of this project to see some more examples of usage.
+
+#### Example Queries
+##### Term Query
+```json
+{ "query": {"term": {"test_text": "document" } }, "limit": 10 }
+```
+##### Fuzzy Term Query
+```json
+{ "query": {"fuzzy": {"test_text": {"value": "document", "distance": 0, "transposition": false } } }, "limit": 10 }
+```
+##### Phrase Query
+```json
+{ "query": {"phrase": {"test_text": {"terms": ["test","document"] } } }, "limit": 10 }
+```
+##### Range Query
+```json
+{ "query": {"range": { "test_i64": { "gte": 2012, "lte": 2015 } } }, "limit": 10 }
+```
+##### Regex Query
+```json
+{ "query": {"regex": { "test_text": "d[ou]{1}c[k]?ument" } }, "limit": 10 }
+```
+##### Boolean Query
+```json
+{ "query": {"bool": {"must": [ { "term": { "test_text": "document" } } ], "must_not": [ {"range": {"test_i64": { "gt": 2017 } } } ] } }, "limit": 10 }
 ```
 
-Once Toshi is up and running we can create an index. Toshi uses Tantivy so creating an index requires a Tantivy Schema. Let's create a simple one seen below.
-
+##### Usage
+To try any of the above queries you can use the above example
 ```bash
-curl -X PUT \
-  http://localhost:8080/test_index \
-  -H 'Content-Type: application/json' \
-  -d '[
-    {
-      "name": "test_text",
-      "type": "text",
-      "options": {
-        "indexing": {
-          "record": "position",
-          "tokenizer": "default"
-        },
-        "stored": true
-      }
-    },
-    {
-      "name": "test_i64",
-      "type": "i64",
-      "options": {
-        "indexed": true,
-        "stored": true
-      }
-    },
-    {
-      "name": "test_u64",
-      "type": "u64",
-      "options": {
-        "indexed": true,
-        "stored": true
-      }
-    }
-  ]'
-  ```
-  
-If everything succeeded we should receive a `201 CREATED` from this request and if you look in the data directory you configured you
-should now see a directory for the `test_index` you just created.
-
-Now we can add some documents to our index. The options field can be omitted if a user does not want to commit on every document addition, but for completeness it is included here:
-
-```bash
-curl -X PUT \
-  http://localhost:8080/test_index \
-  -H 'Content-Type: application/json' \
-  -d '{
-        "options": { "commit": true },
-        "document": {
-          "test_text": "Babbaboo!",
-          "test_u64": 10,
-          "test_i64": -10
-        }
-    }'
+curl -X POST http://localhost:8080/test_index -H 'Content-Type: application/json' -d '{ "query": {"term": {"test_text": "document" } }, "limit": 10 }'
 ```
-
-And finally we can retrieve all the documents in an index with a simple GET call:
-
-```bash
-curl -X GET http://localhost:8080/test_index -H 'Content-Type: application/json'
-```
+Also, to note, limit is optional, 10 is the default value. It's only included here for completeness.
 
 #### Running Tests
 
@@ -198,4 +199,4 @@ curl -X GET http://localhost:8080/test_index -H 'Content-Type: application/json'
 
 #### What is a Toshi?
 
-Toshi is a three year old Shiba Inu. He is a very good boy and is the official mascot of this project. Toshi personally reviews all code before it is commited to this repository and is dedicated to only accepting the highest quality contributions from his human. He will though accept treats for easier code reviews. 
+Toshi is a three year old Shiba Inu. He is a very good boy and is the official mascot of this project. Toshi personally reviews all code before it is committed to this repository and is dedicated to only accepting the highest quality contributions from his human. He will, though, accept treats for easier code reviews. 
